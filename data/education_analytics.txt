@@ -1,0 +1,9 @@
+Education Analytics conducts research and develops rigorous analytics that support actionable solutions and drive continuous improvement in American education. We help our partners make better decisions on policies and programs that lead to success for all students.
+
+Sophie spent 1.5 years at Education Analytics, where she held roles as both a Data Analyst Intern and later as an Assistant Research Analyst. Over this time, she contributed to projects at the intersection of educational research, data engineering, and stakeholder-facing analytics.
+
+As a Data Analyst Intern, Sophie focused on building interactive reporting dashboards using RShiny, designed to communicate complex data insights to external education partners. For her internship capstone, she designed and implemented a reusable, branded RShiny dashboard template, enabling future analysts to rapidly develop polished, consistent reporting tools tailored to client needs.
+
+In her role as an Assistant Research Analyst, Sophie collaborated with senior researchers to evaluate large-scale survey data related to student social-emotional learning (SEL). She applied techniques such as Principal Component Analysis (PCA) and Exploratory Factor Analysis (EFA) to explore underlying constructs and ensure statistical validity of SEL metrics.
+
+In parallel, Sophie partnered with data engineering teams to support the development of a client-specific data warehouse. Her contributions included writing data validation and sanitation scripts, helping define ETL logic, and ensuring high data quality standards during ingestion and transformation processes.

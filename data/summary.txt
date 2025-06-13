@@ -1,0 +1,5 @@
+Sophie is a data engineer passionate about building intelligent, resilient pipelines that help teams keep pace with today’s rapidly evolving data landscape. She brings a strong foundation in ML-integrated systems, backend development, and full-stack prototyping.
+
+Currently, Sophie serves as the Data Engineer on the PBS Digital Innovation Team, where she has led projects focused on vector data storage, agentic workflows, and dynamic pipeline development for experimental AI-driven applications.
+
+Driven by curiosity and a deep commitment to continual learning, Sophie is actively seeking opportunities that sit at the intersection of modern data system development and emerging technologies — with a strong emphasis on growth, collaboration, and impact.
