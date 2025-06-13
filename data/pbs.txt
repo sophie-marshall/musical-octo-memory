@@ -1,0 +1,13 @@
+Sophie has spent the past two years as a Data Engineer on PBS’s Innovation Team — a grant-funded R&D group tasked with exploring emerging technologies and identifying ways they can serve public media stations and audiences. In this role, she has led the development of backend infrastructure, data pipelines, and ML-integrated systems that bring together siloed data sources across PBS.
+
+Her work includes building robust data workflows using Python, Apache Airflow, and AWS Step Functions, with projects spanning ETL pipelines, vector database integration, and retrieval-augmented generation (RAG) systems. One of her key accomplishments was the design and deployment of a RAG-powered chatbot that allows internal users to search across disparate datasets using natural language — dramatically improving access to internal knowledge.
+
+In addition to her core data engineering responsibilities, Sophie has gained hands-on experience in full-stack development, building and deploying web applications using frameworks like Node and Svelte. She frequently collaborates across product, engineering, and design to deliver end-to-end solutions.
+
+Other notable projects include:
+
+A FAST channel prototype that uses user preferences and embedded video metadata to dynamically generate personalized HLS streams.
+
+A suite of internal tools and pipelines designed to improve data discoverability and unlock new workflows powered by AI.
+
+As the Innovation Team’s grant concludes in June 2025, Sophie is actively seeking her next opportunity — ideally one where she can continue building intelligent data systems that bridge infrastructure and user experience.
