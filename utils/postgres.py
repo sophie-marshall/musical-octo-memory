@@ -87,7 +87,7 @@ class PostgresClient:
             results = cursor.fetchall()
             return results
         except Exception as e:
-            print(f"Error conduting semantic search: {str(e)}")
+            print(f"Error conducting semantic search: {str(e)}")
             return None
         finally:
             cursor.close()
