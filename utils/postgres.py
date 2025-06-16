@@ -189,7 +189,7 @@ class PostgresClient:
             tag = combined[uid]["tag_score"]
             combined[uid]["hybrid_score"] = alpha * semantic + (1 - alpha) * tag
 
-        # sort by hybrid score\
+        # sort by hybrid score
         top_results = sorted(
             combined.values(), key=lambda x: x["hybrid_score"], reverse=True
         )[:n_results]
