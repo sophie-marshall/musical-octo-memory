@@ -48,3 +48,25 @@ class PostgresClient:
             conn.close()
         except Exception as e:
             print(f"Error connecting to Postgres: {str(e)}")
+
+    def semantic_search(self, query_embedding: list, n_results: int = 5):
+        # convert query embedidng to the proper format
+        query_embedding_str = ", ".join(map(str, query_embedding))
+
+        # build query
+        search = f"SELECT document_id, tags, clean_text, 1 - (embedding <=> '[{query_embedding_str}]') as similarity_score FROM content_embeddings ORDER BY embedding <=> '[{query_embedding_str}]' LIMIT {n_results};"
+
+        # establish a connection to the DB
+        conn = self._make_conn()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(search)
+            results = cursor.fetchall()
+            return results
+        except Exception as e:
+            print(f"Error conduting semantic search: {str(e)}")
+            return None
+        finally:
+            cursor.close()
+
+    # def tag_boost_search()
