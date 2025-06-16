@@ -91,6 +91,7 @@ class PostgresClient:
             return None
         finally:
             cursor.close()
+            conn.close()
 
     def tag_search(
         self, query: str, n_results: int = 10, similarity_threshold: float = 0.3
