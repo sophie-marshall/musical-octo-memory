@@ -4,29 +4,50 @@ import numpy as np
 import nltk
 from nltk.corpus import stopwords
 from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+import os
 
 
 class PostgresClient:
 
+    # class level configs
     nltk.download("stopwords", quiet=True)
+    stop_words = set(stopwords.words("english"))
+    embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-    def __init__(self, pg_host: str, pg_user: str, pg_password: str, pg_db: str):
-        self.pg_host = pg_host
-        self.pg_user = pg_user
-        self.pg_password = pg_password
-        self.pg_db = pg_db
-        self.stop_words = set(stopwords.words("english"))
-        self.embedding_model = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2"
-        )
+    def __init__(
+        self,
+        pg_host: str = None,
+        pg_user: str = None,
+        pg_password: str = None,
+        pg_db: str = None,
+    ):
+        # load environment variables
+        load_dotenv()
 
-    def _make_conn(self):
+        # Use provided values or fall back to environment variables
+        self.pg_host = os.getenv("PG_HOST")
+        self.pg_user = os.getenv("PG_USER")
+        self.pg_password = os.getenv("PG_PASSWORD")
+        self.pg_db = os.getenv("PG_DB")
+
+        # Validate that we have all required connection parameters
+        if not all([self.pg_host, self.pg_user, self.pg_password, self.pg_db]):
+            raise ValueError(
+                "Missing required database connection parameters. "
+                "Either provide them explicitly or set environment variables."
+            )
+
+    @classmethod
+    def _make_conn(cls, host=None, user=None, password=None, dbname=None):
         try:
+            # Load environment variables if not provided
+            load_dotenv()
             conn = psycopg2.connect(
-                host=self.pg_host,
-                user=self.pg_user,
-                password=self.pg_password,
-                dbname=self.pg_db,
+                host=host or os.getenv(cls.ENV_VARS["host"]),
+                user=user or os.getenv(cls.ENV_VARS["user"]),
+                password=password or os.getenv(cls.ENV_VARS["password"]),
+                dbname=dbname or os.getenv(cls.ENV_VARS["dbname"]),
             )
             register_vector(conn)
             return conn
@@ -34,22 +55,25 @@ class PostgresClient:
             print(f"Error connecting to Postgres: {str(e)}")
             return None
 
-    def _normalize_embedding(self, embedding):
+    @staticmethod
+    def _normalize_embedding(embedding):
         norm = np.linalg.norm(embedding)
         return embedding / norm if norm > 0 else embedding
 
+    @staticmethod
     def _remove_stopwords(self, text: str) -> list:
         return [
             word.lower() for word in text.split() if word.lower() not in self.stop_words
         ]
 
-    def insert_content_embeddings(self, data: list):
+    @classmethod
+    def insert_content_embeddings(cls, data: list):
         try:
-            conn = self._make_conn()
+            conn = cls._make_conn()
             cursor = conn.cursor()
             for record in data:
                 try:
-                    norm_embedding = self._normalize_embedding(record["embedding"])
+                    norm_embedding = cls._normalize_embedding(record["embedding"])
                     cursor.execute(
                         """
                                 INSERT INTO content_embeddings(document_id, tags, clean_text, embedding)
@@ -70,17 +94,18 @@ class PostgresClient:
         except Exception as e:
             print(f"Error connecting to Postgres: {str(e)}")
 
-    def semantic_search(self, query: list, n_results: int = 5):
+    @classmethod
+    def semantic_search(cls, query: list, n_results: int = 5):
         # convert query embedidng to the proper format
-        query_embedding = self.embedding_model.encode(query)
-        norm_query_embedding = self._normalize_embedding(np.array(query_embedding))
+        query_embedding = cls.embedding_model.encode(query)
+        norm_query_embedding = cls._normalize_embedding(np.array(query_embedding))
         query_embedding_str = ", ".join(map(str, norm_query_embedding.tolist()))
 
         # build query
         search = f"SELECT uid, document_id, tags, clean_text, 1 - (embedding <=> '[{query_embedding_str}]') as similarity_score FROM content_embeddings ORDER BY embedding <=> '[{query_embedding_str}]' LIMIT {n_results};"
 
         # establish a connection to the DB
-        conn = self._make_conn()
+        conn = cls._make_conn()
         try:
             cursor = conn.cursor()
             cursor.execute(search)
@@ -93,14 +118,15 @@ class PostgresClient:
             cursor.close()
             conn.close()
 
+    @classmethod
     def tag_search(
-        self, query: str, n_results: int = 10, similarity_threshold: float = 0.3
+        cls, query: str, n_results: int = 10, similarity_threshold: float = 0.3
     ):
-        keywords = self._remove_stopwords(query)
+        keywords = cls._remove_stopwords(query)
         if not keywords:
             return []
 
-        conn = self._make_conn()
+        conn = cls._make_conn()
         try:
             cursor = conn.cursor()
             results = []
@@ -143,9 +169,10 @@ class PostgresClient:
             cursor.close()
             conn.close()
 
-    def hybrid_search(self, query: str, n_results: int = 5, alpha: float = 0.7):
-        semantic_results = self.semantic_search(query, n_results=5)
-        tag_results = self.tag_search(query, n_results=5)
+    @classmethod
+    def hybrid_search(cls, query: str, n_results: int = 5, alpha: float = 0.7):
+        semantic_results = cls.semantic_search(query, n_results=5)
+        tag_results = cls.tag_search(query, n_results=5)
 
         # create some dicts for results
         semantic_dict = {
@@ -193,4 +220,5 @@ class PostgresClient:
         top_results = sorted(
             combined.values(), key=lambda x: x["hybrid_score"], reverse=True
         )[:n_results]
+
         return top_results
