@@ -15,28 +15,13 @@ class PostgresClient:
     stop_words = set(stopwords.words("english"))
     embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-    def __init__(
-        self,
-        pg_host: str = None,
-        pg_user: str = None,
-        pg_password: str = None,
-        pg_db: str = None,
-    ):
-        # load environment variables
-        load_dotenv()
-
-        # Use provided values or fall back to environment variables
-        self.pg_host = os.getenv("PG_HOST")
-        self.pg_user = os.getenv("PG_USER")
-        self.pg_password = os.getenv("PG_PASSWORD")
-        self.pg_db = os.getenv("PG_DB")
-
-        # Validate that we have all required connection parameters
-        if not all([self.pg_host, self.pg_user, self.pg_password, self.pg_db]):
-            raise ValueError(
-                "Missing required database connection parameters. "
-                "Either provide them explicitly or set environment variables."
-            )
+    # env vars
+    ENV_VARS = {
+        "host": "PG_HOST",
+        "user": "PG_USER",
+        "password": "PG_PASSWORD",
+        "dbname": "PG_DB",
+    }
 
     @classmethod
     def _make_conn(cls, host=None, user=None, password=None, dbname=None):
@@ -60,10 +45,10 @@ class PostgresClient:
         norm = np.linalg.norm(embedding)
         return embedding / norm if norm > 0 else embedding
 
-    @staticmethod
-    def _remove_stopwords(self, text: str) -> list:
+    @classmethod
+    def _remove_stopwords(cls, text: str) -> list:
         return [
-            word.lower() for word in text.split() if word.lower() not in self.stop_words
+            word.lower() for word in text.split() if word.lower() not in cls.stop_words
         ]
 
     @classmethod
@@ -122,7 +107,7 @@ class PostgresClient:
     def tag_search(
         cls, query: str, n_results: int = 10, similarity_threshold: float = 0.3
     ):
-        keywords = cls._remove_stopwords(query)
+        keywords = cls._remove_stopwords(text=query)
         if not keywords:
             return []
 
